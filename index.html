@@ -94,25 +94,52 @@ button:hover {
     100% {transform:translateY(-100vh) rotate(20deg);}
 }
 
-#musicIcon {
+.music-controls {
     position:fixed;
     top:20px;
     right:20px;
+    z-index:100;
+    background:white;
+    padding:10px 15px;
+    border-radius:25px;
+    box-shadow:0 3px 15px rgba(0,0,0,.2);
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.music-btn {
     background:#ff4d6d;
     color:white;
+    border:none;
     width:40px;
     height:40px;
     border-radius:50%;
+    cursor:pointer;
+    font-size:18px;
     display:flex;
     align-items:center;
     justify-content:center;
-    cursor:pointer;
-    z-index:100;
-    box-shadow:0 3px 10px rgba(0,0,0,.2);
 }
 
-#musicIcon.muted {
+.music-btn.muted {
     background:#ccc;
+}
+
+#audioStatus {
+    font-size:14px;
+    color:#666;
+    white-space:nowrap;
+}
+
+.instructions {
+    background:#fff8e1;
+    padding:10px 15px;
+    border-radius:10px;
+    margin:10px 0;
+    border-left:4px solid #ffb74d;
+    font-size:14px;
+    color:#5d4037;
 }
 </style>
 </head>
@@ -122,7 +149,11 @@ button:hover {
 <div class="container">
     <h1>🎉 Happy Birthday Uzair 🎂</h1>
     
-    <button onclick="surprise()">Click for Surprise 🎁</button>
+    <div class="instructions">
+        🔊 Click the "Surprise" button first, then use music controls in top-right
+    </div>
+    
+    <button onclick="startExperience()">Click for Surprise 🎁</button>
     
     <h3 id="msg"></h3>
     
@@ -133,56 +164,27 @@ button:hover {
     </div>
 </div>
 
-<!-- Music Control Icon -->
-<div id="musicIcon" onclick="toggleMusic()">🎵</div>
+<!-- Music Controls -->
+<div class="music-controls" style="display:none;" id="musicControls">
+    <button class="music-btn" id="playBtn" onclick="playMusic()">▶️</button>
+    <button class="music-btn" id="pauseBtn" onclick="pauseMusic()">⏸️</button>
+    <button class="music-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+    <span id="audioStatus">Ready</span>
+</div>
 
-<!-- Audio Element -->
-<audio id="bgMusic" loop>
+<!-- Audio Element - Preload but don't autoplay -->
+<audio id="bgMusic" preload="auto" loop>
    <source src="./song.mp3" type="audio/mpeg">
    <source src="./song.ogg" type="audio/ogg">
-   Your browser does not support the audio element.
+   Your browser does not support audio.
 </audio>
 
 <script>
-let musicPlaying = false;
+let audioInitialized = false;
 const bgMusic = document.getElementById('bgMusic');
+bgMusic.volume = 0.7; // Set volume to 70%
 
-// Ensure files exist on Vercel - update these paths if needed
-const imagePaths = ['./pic1.jpg', './pic2.jpg'];
-const audioPath = './song.mp3';
-
-function toggleMusic() {
-    const musicIcon = document.getElementById('musicIcon');
-    if (musicPlaying) {
-        bgMusic.pause();
-        musicIcon.classList.add('muted');
-        musicIcon.textContent = '🔇';
-    } else {
-        bgMusic.play().catch(e => {
-            console.log('Audio play failed:', e);
-            alert('Please click the button first to enable audio!');
-        });
-        musicIcon.classList.remove('muted');
-        musicIcon.textContent = '🎵';
-    }
-    musicPlaying = !musicPlaying;
-}
-
-function surprise(){
-    // First ensure images are loaded properly
-    preloadImages();
-    
-    // Try to play music (user interaction required)
-    bgMusic.volume = 0.7;
-    bgMusic.play().then(() => {
-        musicPlaying = true;
-        document.getElementById('musicIcon').textContent = '🎵';
-    }).catch(error => {
-        console.log('Audio play was prevented:', error);
-        // Show message about clicking to enable audio
-        alert('Click "OK" then click the music icon 🎵 in the top right to enable background music!');
-    });
-    
+function startExperience() {
     // Show message
     document.getElementById("msg").innerHTML = "✨ May you be mine forever! ✨";
     
@@ -191,7 +193,74 @@ function surprise(){
         img.style.display = 'block';
     });
     
+    // Show music controls
+    document.getElementById('musicControls').style.display = 'flex';
+    document.getElementById('audioStatus').textContent = 'Click ▶️ to play';
+    
+    // Initialize audio (required by browsers)
+    initializeAudio();
+    
     // Create balloons
+    createBalloons();
+    
+    // Start speech
+    playBirthdaySpeech();
+}
+
+function initializeAudio() {
+    // This function is called on first user click to initialize audio
+    if (!audioInitialized) {
+        // Load and play a silent sound to "unlock" audio
+        const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
+        silentAudio.volume = 0.001;
+        
+        silentAudio.play().then(() => {
+            silentAudio.pause();
+            silentAudio.currentTime = 0;
+            audioInitialized = true;
+            console.log("Audio unlocked!");
+            
+            // Now preload the actual music
+            bgMusic.load();
+            document.getElementById('audioStatus').textContent = 'Ready to play';
+        }).catch(e => {
+            console.log("Could not unlock audio:", e);
+        });
+    }
+}
+
+function playMusic() {
+    if (!audioInitialized) {
+        initializeAudio();
+        setTimeout(playMusic, 500);
+        return;
+    }
+    
+    bgMusic.play().then(() => {
+        document.getElementById('audioStatus').textContent = 'Playing...';
+        console.log("Music started successfully!");
+    }).catch(error => {
+        console.error("Error playing music:", error);
+        document.getElementById('audioStatus').textContent = 'Click to enable';
+        
+        // Show help message
+        alert("Please click 'OK' then click the ▶️ button again to play music.\nBrowsers require permission to play audio.");
+    });
+}
+
+function pauseMusic() {
+    bgMusic.pause();
+    document.getElementById('audioStatus').textContent = 'Paused';
+}
+
+function toggleMute() {
+    bgMusic.muted = !bgMusic.muted;
+    const muteBtn = document.getElementById('muteBtn');
+    muteBtn.textContent = bgMusic.muted ? '🔇' : '🔊';
+    document.getElementById('audioStatus').textContent = bgMusic.muted ? 'Muted' : 'Playing...';
+}
+
+function createBalloons() {
     for(let i=0;i<25;i++){
         let b = document.createElement("div");
         b.className = "balloon";
@@ -201,8 +270,9 @@ function surprise(){
         b.style.animationDelay = Math.random()*2 + "s";
         document.body.appendChild(b);
     }
-    
-    // Speech synthesis
+}
+
+function playBirthdaySpeech() {
     if ('speechSynthesis' in window) {
         let speech = new SpeechSynthesisUtterance(
             "Happy 23rd Birthday Uzair! I love you so much. Your birthday is literally my Eid. I wanna celebrate your birthday like a festival but unfortunately we are living in long distance. Anyway I wanted to make you feel special in a long distance too. I want you to know that you are my whole world. No one can take your place. You are the bestest part of my life. May Allah bless you with happiness! May You become EO very soon and make me proud so I can successfully introduce you to my family. Once again happy birthday love"
@@ -212,23 +282,6 @@ function surprise(){
         speechSynthesis.speak(speech);
     }
 }
-
-function preloadImages() {
-    imagePaths.forEach(src => {
-        const img = new Image();
-        img.src = src;
-        img.onerror = () => {
-            console.error(`Failed to load image: ${src}`);
-            // Try alternative paths
-            if (src.startsWith('./')) {
-                img.src = src.substring(2); // Remove ./
-            }
-        };
-    });
-}
-
-// Preload images on page load
-window.addEventListener('load', preloadImages);
 
 // Clean up balloons after animation
 setInterval(() => {
@@ -240,6 +293,21 @@ setInterval(() => {
         }
     });
 }, 1000);
+
+// Keyboard shortcuts for music
+document.addEventListener('keydown', (e) => {
+    if (e.key === ' ') { // Space bar
+        e.preventDefault();
+        if (bgMusic.paused) {
+            playMusic();
+        } else {
+            pauseMusic();
+        }
+    }
+    if (e.key === 'm' || e.key === 'M') {
+        toggleMute();
+    }
+});
 </script>
 
 </body>
