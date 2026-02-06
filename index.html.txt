@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday 🎉</title>
+
+<style>
+body {
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+font-family:Arial;
+overflow:hidden;
+}
+
+.container {
+text-align:center;
+background:white;
+padding:40px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,.2);
+animation:pop 1s;
+max-width:500px;
+width:90%;
+}
+
+@keyframes pop {
+from {transform:scale(.5);opacity:0;}
+to {transform:scale(1);opacity:1;}
+}
+
+h1 {
+color:#ff4d6d;
+}
+
+button {
+padding:12px 25px;
+border:none;
+border-radius:20px;
+background:#ff4d6d;
+color:white;
+font-size:16px;
+cursor:pointer;
+margin:20px 0;
+}
+
+button:hover {
+background:#ff1f4b;
+}
+
+#msg {
+margin:20px 0;
+min-height:30px;
+}
+
+/* IMAGES SIDE BY SIDE - FIXED */
+.images-row {
+display:flex;
+justify-content:center;
+gap:15px;
+margin-top:20px;
+flex-wrap:wrap;
+}
+
+#friendPic, #second {
+width:150px;
+height:auto; /* Auto height to maintain aspect ratio */
+max-height:200px; /* Limit maximum height */
+border-radius:10px;
+display:none;
+box-shadow:0 5px 15px rgba(0,0,0,.3);
+/* Remove object-fit: cover to prevent cropping */
+}
+
+.balloon {
+position:absolute;
+bottom:-100px;
+width:40px;
+height:50px;
+border-radius:50%;
+animation:float 6s infinite;
+}
+
+@keyframes float {
+0% {transform:translateY(0);}
+100% {transform:translateY(-900px);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>🎉 Happy Birthday Uzair 🎂</h1>
+
+<button onclick="surprise()">Click for Surprise 🎁</button>
+
+<h3 id="msg"></h3>
+
+<!-- Images in a row, side by side -->
+<div class="images-row">
+    <img id="friendPic" src="Screenshot 2026-02-05 175333.png">
+    <img id="second" src="Screenshot 2026-02-05 185423.png">
+</div>
+
+</div>
+
+<audio id="bgMusic">
+   <source src="WhatsApp Audio 2026-02-05 at 6.04.58 PM.mpeg" type="audio/mpeg">
+</audio>
+
+<script>
+function surprise(){
+    // Play music
+    document.getElementById("bgMusic").play();
+    
+    // Show message
+    document.getElementById("msg").innerHTML =
+        "✨ May you be mine forever! ✨";
+    
+    // Show both images
+    document.getElementById("friendPic").style.display = "block";
+    document.getElementById("second").style.display = "block";
+    
+    // Create balloons
+    for(let i=0;i<25;i++){
+        let b = document.createElement("div");
+        b.className = "balloon";
+        b.style.left = Math.random()*100 + "%";
+        b.style.background = `hsl(${Math.random()*360},100%,60%)`;
+        b.style.animationDuration = (Math.random()*3+4) + "s";
+        document.body.appendChild(b);
+    }
+    
+    // Speech synthesis
+    speechSynthesis.speak(
+        new SpeechSynthesisUtterance("Happy 23 Birthday Uzyr! I love you so much. Your birthday is literally my Eeed. I wanna celebrate your birthday like a festival but unfortunately we are living in long distance. Anyway I wanted to make you feel special in a long distance too. I want you to know that you are my whole world. No one can take your place. You are the bestest part of my life. May Allah bless you with happiness! May You become EO very soon and make me proud so I can successfully introduce you to my family. Once again happy birthday love")
+    );
+}
+</script>
+
+</body>
+</html>
