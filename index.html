@@ -65,14 +65,13 @@ margin-top:20px;
 flex-wrap:wrap;
 }
 
-#friendPic, #second {
+.images-row img {
 width:150px;
-height:auto; /* Auto height to maintain aspect ratio */
-max-height:200px; /* Limit maximum height */
+height:auto;
+max-height:200px;
 border-radius:10px;
 display:none;
 box-shadow:0 5px 15px rgba(0,0,0,.3);
-/* Remove object-fit: cover to prevent cropping */
 }
 
 .balloon {
@@ -88,30 +87,10 @@ animation:float 6s infinite;
 0% {transform:translateY(0);}
 100% {transform:translateY(-900px);}
 }
-
-/* Simple music button */
-.music-btn {
-position: fixed;
-top: 20px;
-right: 20px;
-background: #ff4d6d;
-color: white;
-width: 50px;
-height: 50px;
-border-radius: 50%;
-border: none;
-font-size: 20px;
-cursor: pointer;
-z-index: 100;
-box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
 </style>
 </head>
 
 <body>
-
-<!-- Music Button -->
-<button class="music-btn" id="musicBtn" onclick="playMusicFirst()">🔇</button>
 
 <div class="container">
 <h1>🎉 Happy Birthday Uzair 🎂</h1>
@@ -122,86 +101,21 @@ box-shadow: 0 3px 10px rgba(0,0,0,0.2);
 
 <!-- Images in a row, side by side -->
 <div class="images-row">
-    <img id="friendPic" src="pic1.jpg" alt="Photo 1">
-    <img id="second" src="pic2.jpg" alt="Photo 2">
+    <img id="friendPic" src="pic1.jpg" alt="Birthday photo">
+    <img id="second" src="pic2.jpg" alt="Birthday photo">
 </div>
 
 </div>
-
-<audio id="bgMusic" loop>
-   <source src="song.mp3" type="audio/mpeg">
-</audio>
 
 <script>
-let musicReady = false;
-
-// FIRST: User must click the music button before anything else
-function playMusicFirst() {
-    const bgMusic = document.getElementById('bgMusic');
-    const musicBtn = document.getElementById('musicBtn');
-    
-    bgMusic.volume = 0.7; // Set volume
-    
-    bgMusic.play().then(() => {
-        musicReady = true;
-        musicBtn.textContent = '🔊';
-        musicBtn.style.background = '#4CAF50';
-        musicBtn.onclick = function() {
-            bgMusic.pause();
-            musicBtn.textContent = '🔇';
-            musicBtn.style.background = '#ff4d6d';
-            musicBtn.onclick = function() {
-                bgMusic.play();
-                musicBtn.textContent = '🔊';
-                musicBtn.style.background = '#4CAF50';
-                musicBtn.onclick = function() {
-                    bgMusic.pause();
-                    musicBtn.textContent = '🔇';
-                    musicBtn.style.background = '#ff4d6d';
-                    musicBtn.onclick = function() {
-                        bgMusic.play();
-                        musicBtn.textContent = '🔊';
-                        musicBtn.style.background = '#4CAF50';
-                    };
-                };
-            };
-        };
-        alert("🎵 Music enabled! Now click the 'Click for Surprise' button.");
-    }).catch(error => {
-        alert("❌ Could not play music. Trying with fallback...");
-        // Try with fallback online music
-        tryOnlineMusic();
-    });
-}
-
-function tryOnlineMusic() {
-    const bgMusic = document.getElementById('bgMusic');
-    // Clear current source
-    bgMusic.innerHTML = '';
-    // Add online birthday music
-    const source = document.createElement('source');
-    source.src = 'https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-443.mp3';
-    source.type = 'audio/mpeg';
-    bgMusic.appendChild(source);
-    bgMusic.load();
-    
-    bgMusic.play().then(() => {
-        musicReady = true;
-        document.getElementById('musicBtn').textContent = '🔊';
-        document.getElementById('musicBtn').style.background = '#4CAF50';
-        alert("✅ Online birthday music playing! Now click 'Click for Surprise'.");
-    }).catch(e => {
-        alert("⚠️ Music cannot be played due to browser restrictions. The rest will still work!");
-    });
-}
-
 function surprise(){
     // Show message
     document.getElementById("msg").innerHTML = "✨ May you be mine forever! ✨";
     
     // Show both images
-    document.getElementById("friendPic").style.display = "block";
-    document.getElementById("second").style.display = "block";
+    document.querySelectorAll('.images-row img').forEach(img => {
+        img.style.display = "block";
+    });
     
     // Create balloons
     for(let i=0;i<25;i++){
@@ -217,11 +131,6 @@ function surprise(){
     speechSynthesis.speak(
         new SpeechSynthesisUtterance("Happy 23 Birthday Uzyr! I love you so much. Your birthday is literally my Eeed. I wanna celebrate your birthday like a festival but unfortunately we are living in long distance. Anyway I wanted to make you feel special in a long distance too. I want you to know that you are my whole world. No one can take your place. You are the bestest part of my life. May Allah bless you with happiness! May You become EO very soon and make me proud so I can successfully introduce you to my family. Once again happy birthday love")
     );
-    
-    // Check if music is playing
-    if (!musicReady) {
-        document.getElementById("msg").innerHTML += "<br><small style='color:red;'>Click the 🔊 button in top right first for music!</small>";
-    }
 }
 </script>
 
