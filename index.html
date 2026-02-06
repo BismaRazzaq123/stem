@@ -3,90 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <title>Happy Birthday 🎉</title>
-
 <style>
 body {
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-font-family:Arial;
-overflow:hidden;
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+    font-family:Arial, sans-serif;
+    overflow:hidden;
 }
 
 .container {
-text-align:center;
-background:white;
-padding:40px;
-border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,.2);
-animation:pop 1s;
-max-width:500px;
-width:90%;
+    text-align:center;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+    animation:pop 1s;
+    max-width:500px;
+    width:90%;
+    z-index:10;
+    position:relative;
 }
 
 @keyframes pop {
-from {transform:scale(.5);opacity:0;}
-to {transform:scale(1);opacity:1;}
+    from {transform:scale(.5);opacity:0;}
+    to {transform:scale(1);opacity:1;}
 }
 
 h1 {
-color:#ff4d6d;
+    color:#ff4d6d;
 }
 
 button {
-padding:12px 25px;
-border:none;
-border-radius:20px;
-background:#ff4d6d;
-color:white;
-font-size:16px;
-cursor:pointer;
-margin:20px 0;
+    padding:12px 25px;
+    border:none;
+    border-radius:20px;
+    background:#ff4d6d;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    margin:20px 0;
+    transition:background 0.3s;
 }
 
 button:hover {
-background:#ff1f4b;
+    background:#ff1f4b;
 }
 
 #msg {
-margin:20px 0;
-min-height:30px;
+    margin:20px 0;
+    min-height:30px;
+    font-size:18px;
+    color:#333;
 }
 
 /* IMAGES SIDE BY SIDE - FIXED */
 .images-row {
-display:flex;
-justify-content:center;
-gap:15px;
-margin-top:20px;
-flex-wrap:wrap;
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:20px;
+    flex-wrap:wrap;
 }
 
-#friendPic, #second {
-width:150px;
-height:auto; /* Auto height to maintain aspect ratio */
-max-height:200px; /* Limit maximum height */
-border-radius:10px;
-display:none;
-box-shadow:0 5px 15px rgba(0,0,0,.3);
-/* Remove object-fit: cover to prevent cropping */
+.images-row img {
+    width:150px;
+    height:auto;
+    max-height:200px;
+    border-radius:10px;
+    display:none;
+    box-shadow:0 5px 15px rgba(0,0,0,.3);
+    object-fit:cover;
 }
 
 .balloon {
-position:absolute;
-bottom:-100px;
-width:40px;
-height:50px;
-border-radius:50%;
-animation:float 6s infinite;
+    position:absolute;
+    bottom:-100px;
+    width:40px;
+    height:50px;
+    border-radius:50%;
+    animation:float 6s infinite;
+    z-index:1;
 }
 
 @keyframes float {
-0% {transform:translateY(0);}
-100% {transform:translateY(-900px);}
+    0% {transform:translateY(0) rotate(0deg);}
+    100% {transform:translateY(-100vh) rotate(20deg);}
+}
+
+#musicIcon {
+    position:fixed;
+    top:20px;
+    right:20px;
+    background:#ff4d6d;
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:100;
+    box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+#musicIcon.muted {
+    background:#ccc;
 }
 </style>
 </head>
@@ -94,55 +120,127 @@ animation:float 6s infinite;
 <body>
 
 <div class="container">
-<h1>🎉 Happy Birthday Uzair 🎂</h1>
-
-<button onclick="surprise()">Click for Surprise 🎁</button>
-
-<h3 id="msg"></h3>
-
-<!-- Images in a row, side by side -->
-<div class="images-row">
-    <img id="friendPic" src="pic1.jpg">
-<img src="pic2.jpg">">
-    <img id="second" src="pic2.jpg">
+    <h1>🎉 Happy Birthday Uzair 🎂</h1>
+    
+    <button onclick="surprise()">Click for Surprise 🎁</button>
+    
+    <h3 id="msg"></h3>
+    
+    <!-- Images in a row, side by side -->
+    <div class="images-row">
+        <img id="friendPic" src="./pic1.jpg" alt="Birthday photo 1">
+        <img id="second" src="./pic2.jpg" alt="Birthday photo 2">
+    </div>
 </div>
 
-</div>
+<!-- Music Control Icon -->
+<div id="musicIcon" onclick="toggleMusic()">🎵</div>
 
-<audio id="bgMusic">
-   <source src="song.mp3" type="audio/mpeg">
+<!-- Audio Element -->
+<audio id="bgMusic" loop>
+   <source src="./song.mp3" type="audio/mpeg">
+   <source src="./song.ogg" type="audio/ogg">
+   Your browser does not support the audio element.
 </audio>
 
 <script>
+let musicPlaying = false;
+const bgMusic = document.getElementById('bgMusic');
+
+// Ensure files exist on Vercel - update these paths if needed
+const imagePaths = ['./pic1.jpg', './pic2.jpg'];
+const audioPath = './song.mp3';
+
+function toggleMusic() {
+    const musicIcon = document.getElementById('musicIcon');
+    if (musicPlaying) {
+        bgMusic.pause();
+        musicIcon.classList.add('muted');
+        musicIcon.textContent = '🔇';
+    } else {
+        bgMusic.play().catch(e => {
+            console.log('Audio play failed:', e);
+            alert('Please click the button first to enable audio!');
+        });
+        musicIcon.classList.remove('muted');
+        musicIcon.textContent = '🎵';
+    }
+    musicPlaying = !musicPlaying;
+}
+
 function surprise(){
-    // Play music
-    document.getElementById("bgMusic").play();
+    // First ensure images are loaded properly
+    preloadImages();
+    
+    // Try to play music (user interaction required)
+    bgMusic.volume = 0.7;
+    bgMusic.play().then(() => {
+        musicPlaying = true;
+        document.getElementById('musicIcon').textContent = '🎵';
+    }).catch(error => {
+        console.log('Audio play was prevented:', error);
+        // Show message about clicking to enable audio
+        alert('Click "OK" then click the music icon 🎵 in the top right to enable background music!');
+    });
     
     // Show message
-    document.getElementById("msg").innerHTML =
-        "✨ May you be mine forever! ✨";
+    document.getElementById("msg").innerHTML = "✨ May you be mine forever! ✨";
     
     // Show both images
-    document.getElementById("friendPic").style.display = "block";
-    document.getElementById("second").style.display = "block";
+    document.querySelectorAll('.images-row img').forEach(img => {
+        img.style.display = 'block';
+    });
     
     // Create balloons
     for(let i=0;i<25;i++){
         let b = document.createElement("div");
         b.className = "balloon";
-        b.style.left = Math.random()*100 + "%";
+        b.style.left = Math.random()*95 + "%";
         b.style.background = `hsl(${Math.random()*360},100%,60%)`;
         b.style.animationDuration = (Math.random()*3+4) + "s";
+        b.style.animationDelay = Math.random()*2 + "s";
         document.body.appendChild(b);
     }
     
     // Speech synthesis
-    speechSynthesis.speak(
-        new SpeechSynthesisUtterance("Happy 23 Birthday Uzyr! I love you so much. Your birthday is literally my Eeed. I wanna celebrate your birthday like a festival but unfortunately we are living in long distance. Anyway I wanted to make you feel special in a long distance too. I want you to know that you are my whole world. No one can take your place. You are the bestest part of my life. May Allah bless you with happiness! May You become EO very soon and make me proud so I can successfully introduce you to my family. Once again happy birthday love")
-    );
+    if ('speechSynthesis' in window) {
+        let speech = new SpeechSynthesisUtterance(
+            "Happy 23rd Birthday Uzair! I love you so much. Your birthday is literally my Eid. I wanna celebrate your birthday like a festival but unfortunately we are living in long distance. Anyway I wanted to make you feel special in a long distance too. I want you to know that you are my whole world. No one can take your place. You are the bestest part of my life. May Allah bless you with happiness! May You become EO very soon and make me proud so I can successfully introduce you to my family. Once again happy birthday love"
+        );
+        speech.rate = 1.0;
+        speech.pitch = 1.0;
+        speechSynthesis.speak(speech);
+    }
 }
+
+function preloadImages() {
+    imagePaths.forEach(src => {
+        const img = new Image();
+        img.src = src;
+        img.onerror = () => {
+            console.error(`Failed to load image: ${src}`);
+            // Try alternative paths
+            if (src.startsWith('./')) {
+                img.src = src.substring(2); // Remove ./
+            }
+        };
+    });
+}
+
+// Preload images on page load
+window.addEventListener('load', preloadImages);
+
+// Clean up balloons after animation
+setInterval(() => {
+    const balloons = document.querySelectorAll('.balloon');
+    balloons.forEach(balloon => {
+        const rect = balloon.getBoundingClientRect();
+        if (rect.bottom < -50) {
+            balloon.remove();
+        }
+    });
+}, 1000);
 </script>
 
 </body>
 </html>
-
